@@ -10,7 +10,7 @@ import com.example.desafio_back.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 
 @Service
@@ -26,6 +26,7 @@ public class AuthService {
         return cpf != null && cpf.matches("\\d{11}");
     }
 
+    @Transactional
     public void register(RegisterRequest request) {
         if (!isCpfValid(request.cpf())) {
             throw new IllegalArgumentException("Invalid CPF");
@@ -60,7 +61,7 @@ public class AuthService {
 
     public static boolean isValidCPF(String cpf) {
         if (cpf == null || !cpf.matches("\\d{11}")) return false;
-        if (cpf.chars().distinct().count() == 1) return false; 
+        if (cpf.chars().distinct().count() == 1) return false;
 
         int[] digits = cpf.chars().map(c -> c - '0').toArray();
 

@@ -11,6 +11,7 @@ import com.example.desafio_back.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
@@ -26,6 +27,7 @@ public class QueryService {
 
     private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
 
+    @Transactional(readOnly = true)
     public BalanceResponse balance(Long userId) {
         String key = CommandService.cacheKey(userId);
 
@@ -51,4 +53,5 @@ public class QueryService {
 
         return new BalanceResponse(total, items);
     }
+
 }
