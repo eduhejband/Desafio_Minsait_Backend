@@ -12,7 +12,7 @@ COPY src ./src
 RUN mvn -B -q -DskipTests package
 
 # runtime stage
-FROM eclipse-temurin:21-jre
+FROM eclipse-temurin:17-jdk
 WORKDIR /app
 ENV TZ=America/Sao_Paulo
 # adjust jar name if your artifactId/version differ

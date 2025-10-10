@@ -77,5 +77,4 @@ public class AuthService {
         if (check2 >= 10) check2 = 0;
         return check2 == digits[10];
     }
-
 }
