@@ -81,7 +81,9 @@ public class CommandService {
         String key = cacheKey(userId);
 
         CacheBalance cb = redis.opsForValue().get(key);
-        if (cb == null) cb = new CacheBalance();
+        if (cb == null){
+            cb = new CacheBalance();
+        }
 
         cb.setTotalBalance(acc.getCurrentBalance());
 
