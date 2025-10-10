@@ -37,11 +37,14 @@ class AuthServiceTest {
     }
 
     @Test
-    void register_createsUserWithEncodedPassword_andZeroBalanceAccount() {
-        RegisterRequest req = new RegisterRequest("John Doe", "12345678901", "jdoe", "secret");
+    void register_createsUserWithEncodedPassword_andZeroBalanceAccount_andStripsCpfMask() {
+
+        RegisterRequest req = new RegisterRequest("John Doe", "123.456.789-01", "jdoe", "secret");
+
         when(userRepository.existsByCpf("12345678901")).thenReturn(false);
         when(userRepository.existsByLogin("jdoe")).thenReturn(false);
         when(encoder.encode("secret")).thenReturn("ENC(secret)");
+
         when(userRepository.save(any(User.class))).thenAnswer(inv -> {
             User u = inv.getArgument(0);
             u.setId(42L);
@@ -53,6 +56,7 @@ class AuthServiceTest {
         ArgumentCaptor<User> userCap = ArgumentCaptor.forClass(User.class);
         verify(userRepository).save(userCap.capture());
         User savedUser = userCap.getValue();
+
         assertThat(savedUser.getCompleteName()).isEqualTo("John Doe");
         assertThat(savedUser.getCpf()).isEqualTo("12345678901");
         assertThat(savedUser.getLogin()).isEqualTo("jdoe");
@@ -68,20 +72,26 @@ class AuthServiceTest {
     }
 
     @Test
-    void register_rejectsInvalidCpf() {
-        RegisterRequest bad = new RegisterRequest("John", "123", "j", "x");
+    void register_rejectsExistingCpf() {
+        RegisterRequest req = new RegisterRequest("John", "12345678901", "jdoe", "x");
 
-        assertThatThrownBy(() -> service.register(bad))
+        when(userRepository.existsByCpf("12345678901")).thenReturn(true);
+
+        assertThatThrownBy(() -> service.register(req))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Invalid CPF");
+                .hasMessageContaining("already exists");
 
-        verifyNoInteractions(userRepository, accountRepository, encoder, jwt);
+        verify(userRepository, never()).save(any());
+        verify(accountRepository, never()).save(any());
+        verifyNoInteractions(jwt);
     }
 
     @Test
-    void register_rejectsExistingCpfOrLogin() {
+    void register_rejectsExistingLogin() {
         RegisterRequest req = new RegisterRequest("John", "12345678901", "jdoe", "x");
-        when(userRepository.existsByCpf("12345678901")).thenReturn(true);
+
+        when(userRepository.existsByCpf("12345678901")).thenReturn(false);
+        when(userRepository.existsByLogin("jdoe")).thenReturn(true);
 
         assertThatThrownBy(() -> service.register(req))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -138,18 +148,5 @@ class AuthServiceTest {
                 .hasMessageContaining("Invalid credentials");
 
         verify(jwt, never()).generate(anyString());
-    }
-
-    @Test
-    void isValidCPF_validatesCorrectly() {
-        assertThat(AuthService.isValidCPF("52998224725")).isTrue();
-
-        assertThat(AuthService.isValidCPF("123")).isFalse();
-
-        assertThat(AuthService.isValidCPF("11111111111")).isFalse();
-
-        assertThat(AuthService.isValidCPF("12345678901")).isFalse();
-
-        assertThat(AuthService.isValidCPF(null)).isFalse();
     }
 }

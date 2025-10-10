@@ -1,3 +1,11 @@
 package com.example.desafio_back.dtos;
 
-public record RegisterRequest(String completeName, String cpf, String login, String password) {}
+import jakarta.validation.constraints.NotBlank;
+import org.hibernate.validator.constraints.br.CPF;
+
+public record RegisterRequest(
+        @NotBlank String completeName,
+        @NotBlank @CPF String cpf,
+        @NotBlank String login,
+        @NotBlank String password
+) {}

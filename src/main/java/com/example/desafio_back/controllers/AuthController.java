@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.example.desafio_back.services.AuthService.isValidCPF;
-
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
