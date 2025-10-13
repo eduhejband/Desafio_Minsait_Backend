@@ -44,99 +44,43 @@ Toda a aplicação está **containerizada com Docker Compose**, subindo os segui
 
 O projeto já contém um arquivo `.env` com as variáveis necessárias:
 
+## ▶️ Como Rodar
 
+1.  **Clone o repositório:**
+    ```bash
+    git clone [https://github.com/seu-repo/desafio-cqrs.git](https://github.com/seu-repo/desafio-cqrs.git)
+    cd desafio-cqrs
+    ```
 
-▶️ Como Rodar
+2.  **Suba os containers:**
+    ```bash
+    docker compose up -d --build
+    ```
 
-Clone o repositório:
+3.  **Verifique se os serviços estão rodando:**
+    ```bash
+    docker ps
+    ```
+### 🔐 Autenticação
 
-git clone https://github.com/seu-repo/desafio-cqrs.git
-cd desafio-cqrs
+| Método | Endpoint | Corpo da Requisição (Exemplo) | Descrição |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/auth/register` | ```json\n{ "completeName": "John Doe", "cpf": "52998224725", "login": "jdoe", "password": "123456" }``` | Criar usuário |
+| `POST` | `/auth/login` | ```json\n{ "login": "jdoe", "password": "123456" }``` | Login |
 
-
-Suba os containers:
-
-docker compose up -d --build
-
-
-Verifique se os serviços estão rodando:
-
-docker ps
-
-
-Acesse os serviços:
-
-API Backend → http://localhost:8080
-
-PgAdmin → http://localhost:5050
-
-Redis Commander → http://localhost:8081
-
-🔥 Endpoints Principais
-🔐 Autenticação
-
-POST /auth/register – Criar usuário
-
-{
-  "completeName": "John Doe",
-  "cpf": "52998224725",
-  "login": "jdoe",
-  "password": "123456"
-}
-
-
-POST /auth/login – Login
-
-{
-  "login": "jdoe",
-  "password": "123456"
-}
-
-
-Resposta:
-
+**Resposta de Login (Exemplo):**
+```json
 { "token": "JWT_TOKEN_AQUI" }
+```
+### 💰 Operações Bancárias
 
-💰 Operações Bancárias
+**(necessário JWT no header `Authorization: Bearer ...`)**
 
-(necessário JWT no header Authorization: Bearer ...)
-
-POST /api/deposits
-
-{ "value": 100.00 }
-
-
-POST /api/payments
-
-{ "value": 50.00 }
-
-
-GET /api/balance
-
-{
-  "totalBalance": 50.00,
-  "historic": [
-    { "type": "payment", "value": 50.00, "date": "10-10-2025 12:00:00" },
-    { "type": "deposit", "value": 100.00, "date": "10-10-2025 11:59:00" }
-  ]
-}
-
-🛠️ Desenvolvimento Local (sem Docker)
-
-Suba manualmente Postgres e Redis.
-
-Ajuste application.properties ou use variáveis de ambiente.
-
-Rode com Maven:
-
-mvn spring-boot:run
-
-✅ Testes
-
-Para rodar os testes unitários:
-
-mvn test
-
+| Método | Endpoint | Corpo da Requisição (Exemplo) | Descrição |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/deposits` | ```json\n{ "value": 100.00 }``` | Depositar valor |
+| `POST` | `/api/payments` | ```json\n{ "value": 50.00 }``` | Pagar/Transferir valor |
+| `GET` | `/api/balance` | - | Consultar saldo e histórico |
 
 ## 🔑 Variáveis de Ambiente (.env)
 
